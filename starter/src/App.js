@@ -15,6 +15,28 @@ function App() {
     getBooks();
   }, []);
 
+  const updateShelf = (book, shelf) => {
+    const update = async () => {
+      const res = await BooksAPI.update(book, shelf);
+      const updatedBooks = books.map((book) => {
+        let shelf = "none";
+
+        if (res.currentlyReading.includes(book.id)) {
+          shelf = "currentlyReading";
+        } else if (res.wantToRead.includes(book.id)) {
+          shelf = "wantToRead";
+        } else if (res.read.includes(book.id)) {
+          shelf = "read";
+        }
+
+        return { ...book, shelf: shelf };
+      });
+      setBooks(updatedBooks);
+    }
+
+    update();
+  }
+
   return (
     <div className="app">
       {showSearchPage ? (
@@ -46,16 +68,19 @@ function App() {
             <BookShelf
               title="Currently Reading"
               books={books.filter((book) => book.shelf === "currentlyReading")}
+              onShelfChanged={updateShelf}
             />
 
             <BookShelf
               title="Want To Read"
               books={books.filter((book) => book.shelf === "wantToRead")}
+              onShelfChanged={updateShelf}
             />
 
             <BookShelf
               title="Read"
               books={books.filter((book) => book.shelf === "read")}
+              onShelfChanged={updateShelf}
             />
           </div>
           <div className="open-search">
