@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import BooksGrid from "./BooksGrid";
 
-const SearchBooks = () => {
+const SearchBooks = ({ books, onShelfChanged }) => {
+  const [input, setInput] = useState("");
+
   return (
     <div className="search-books">
       <div className="search-books-bar">
@@ -11,11 +15,16 @@ const SearchBooks = () => {
           <input
             type="text"
             placeholder="Search by title, author, or ISBN"
+            onChange={(e) => setInput(e.target.value)}
+            value={input}
           />
         </div>
       </div>
       <div className="search-books-results">
-        <ol className="books-grid"></ol>
+        <BooksGrid
+          books={books}
+          onShelfChanged={onShelfChanged}
+        />
       </div>
     </div>
   );

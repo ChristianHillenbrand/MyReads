@@ -1,7 +1,7 @@
 const BookShelfChanger = ({ shelf, onShelfChanged }) => {
-  const handleChange = (event) => {
-    event.preventDefault();
-    onShelfChanged(event.target.value);
+  const handleChange = (e) => {
+    e.preventDefault();
+    onShelfChanged(e.target.value);
   }
 
   return (
