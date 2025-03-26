@@ -1,6 +1,6 @@
 import BookShelfChanger from "./BookShelfChanger";
 
-const Book = ({ title, authors, cover }) => {
+const Book = ({ title, authors, image }) => {
   return (
     <div className="book">
       <div className="book-top">
@@ -9,7 +9,7 @@ const Book = ({ title, authors, cover }) => {
           style={{
             width: 128,
             height: 193,
-            backgroundImage: cover,
+            backgroundImage: `url(${image})`,
           }}
         ></div>
         <BookShelfChanger />
