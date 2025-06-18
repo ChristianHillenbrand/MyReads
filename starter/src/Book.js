@@ -1,6 +1,8 @@
 import BookShelfChanger from "./BookShelfChanger";
 
 const Book = ({ book, onShelfChanged }) => {
+  const imageUrl = book.imageLinks ? `url(${book.imageLinks.thumbnail})` : "";
+
   return (
     <div className="book">
       <div className="book-top">
@@ -9,7 +11,7 @@ const Book = ({ book, onShelfChanged }) => {
           style={{
             width: 128,
             height: 193,
-            backgroundImage: `url(${book.imageLinks.thumbnail})`,
+            ...(imageUrl && {backgroundImage: imageUrl}),
           }}
         ></div>
         <BookShelfChanger
