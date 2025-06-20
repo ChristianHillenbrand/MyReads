@@ -1,9 +1,59 @@
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import * as BooksAPI from "./BooksAPI";
 import BooksGrid from "./BooksGrid";
 
-const SearchBooks = ({ books, onShelfChanged }) => {
+const SearchBooks = () => {
   const [input, setInput] = useState("");
+  const [books, setBooks] = useState([]);
+  const queryIdRef = useRef(0);
+
+  useEffect(() => {
+    const searchBooks = async () => {
+      const search = async () => {
+        const res = await BooksAPI.search(input);
+
+        if (res.error) {
+          return [];
+        }
+
+        const books = await BooksAPI.getAll();
+        return res.map(r => {
+          const book = books.find(book => book.id === r.id);
+          return {...r, shelf: book ? book.shelf : "none"};
+        });
+      }
+
+      const queryId = ++queryIdRef.current;
+
+      if (input.length === 0) {
+        setBooks([]);
+      } else {
+        const books = await search();
+        if (queryId === queryIdRef.current) {
+          setBooks(books);
+        }
+      }
+    }
+
+    const timeout = setTimeout(() => {
+      searchBooks();
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [input]);
+
+  const onShelfChanged = (bookToChange, shelf) => {
+    const update = async (bookToChange, shelf) => {
+      await BooksAPI.update(bookToChange, shelf);
+
+      const updatedBooks = books.map(book => 
+        (book.id === bookToChange.id) ? {...book, shelf: shelf} : book 
+      )
+      setBooks(updatedBooks);
+    }
+
+    update(bookToChange, shelf);
+  }
 
   return (
     <div className="search-books">
