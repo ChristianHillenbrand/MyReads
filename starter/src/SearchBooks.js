@@ -3,35 +3,21 @@ import { Link } from "react-router-dom";
 import * as BooksAPI from "./BooksAPI";
 import BooksGrid from "./BooksGrid";
 
-const SearchBooks = () => {
+const SearchBooks = ({ books, onShelfChanged }) => {
   const [input, setInput] = useState("");
-  const [books, setBooks] = useState([]);
+  const [foundBooks, setFoundBooks] = useState([]);
   const queryIdRef = useRef(0);
 
   useEffect(() => {
     const searchBooks = async () => {
-      const search = async () => {
-        const res = await BooksAPI.search(input);
-
-        if (res.error) {
-          return [];
-        }
-
-        const books = await BooksAPI.getAll();
-        return res.map(r => {
-          const book = books.find(book => book.id === r.id);
-          return {...r, shelf: book ? book.shelf : "none"};
-        });
-      }
-
       const queryId = ++queryIdRef.current;
 
       if (input.length === 0) {
-        setBooks([]);
+        setFoundBooks([]);
       } else {
-        const books = await search();
+        const foundBooks = await BooksAPI.search(input);
         if (queryId === queryIdRef.current) {
-          setBooks(books);
+          setFoundBooks(foundBooks);
         }
       }
     }
@@ -41,19 +27,6 @@ const SearchBooks = () => {
     }, 200);
     return () => clearTimeout(timeout);
   }, [input]);
-
-  const onShelfChanged = (bookToChange, shelf) => {
-    const update = async (bookToChange, shelf) => {
-      await BooksAPI.update(bookToChange, shelf);
-
-      const updatedBooks = books.map(book => 
-        (book.id === bookToChange.id) ? {...book, shelf: shelf} : book 
-      )
-      setBooks(updatedBooks);
-    }
-
-    update(bookToChange, shelf);
-  }
 
   return (
     <div className="search-books">
@@ -72,7 +45,12 @@ const SearchBooks = () => {
       </div>
       <div className="search-books-results">
         <BooksGrid
-          books={books}
+          books={
+            foundBooks.map(r => {
+              const book = books.find(book => book.id === r.id);
+              return {...r, shelf: book ? book.shelf : "none"};
+            })
+          }
           onShelfChanged={onShelfChanged}
         />
       </div>
