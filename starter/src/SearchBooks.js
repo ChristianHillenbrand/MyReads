@@ -17,7 +17,7 @@ const SearchBooks = ({ books, onShelfChanged }) => {
       } else {
         const foundBooks = await BooksAPI.search(input);
         if (queryId === queryIdRef.current) {
-          setFoundBooks(foundBooks);
+          setFoundBooks(foundBooks.error ? [] : foundBooks);
         }
       }
     }
