@@ -18,14 +18,19 @@ function App() {
 
   const onShelfChanged = (bookToChange, shelf) => {
     const update = async (bookToChange, shelf) => {
-      const res = await BooksAPI.update(bookToChange, shelf);
-      const order = [...res.currentlyReading, ...res.wantToRead, ...res.read];
+      await BooksAPI.update(bookToChange, shelf);
+    }
 
-      const updatedBooks = books.map(book => 
-        (book.id === bookToChange.id) ? {...book, shelf: shelf} : book 
-      ).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-
-      setBooks(updatedBooks); 
+    const newBook = {...bookToChange, shelf: shelf};
+    if (bookToChange.shelf === "none") {
+      // add the book to the list
+      setBooks([...books, newBook]);
+    } else if (shelf === "none") {
+      // remove the book from the list
+      setBooks(books.filter(book => book.id !== bookToChange.id));
+    } else {
+      // change the shelf of a book already in the list
+      setBooks([...books.filter(book => book.id !== bookToChange.id), newBook]);
     }
 
     update(bookToChange, shelf);
